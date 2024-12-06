@@ -7,6 +7,7 @@ function Timer({
   onTimeRemainingChange,
   onTimeFinished,
   appearDelay,
+  resetTrigger, // New prop for resetting
 }) {
   const [progress, setProgress] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(30); // Start countdown from 30 seconds
@@ -47,10 +48,17 @@ function Timer({
     }
   }, [timeRemaining, onTimeRemainingChange]);
 
+  // Reset the timer when `resetTrigger` changes
+  useEffect(() => {
+    setProgress(0);
+    setTimeRemaining(30);
+  }, [resetTrigger]);
+
   return (
     <div
-      className="w-[1200px] absolute bottom-10 fade-in "
-      style={{ "--fade-delay": `${appearDelay}s` }}>
+      className="w-[1200px] absolute bottom-10 "
+      style={{ "--fade-delay": `${appearDelay}s` }}
+    >
       <div className="w-full border-4 border-red-500 rounded-full p-3">
         <div className="h-4 w-full bg-red-500 bg-opacity-30 rounded-full overflow-hidden">
           <div

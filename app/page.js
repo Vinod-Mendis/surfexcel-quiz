@@ -6,28 +6,45 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Timer from "./components/Timer";
 import Image from "next/image";
+import Scoreboard from "./components/Scoreboard";
 
 export default function Page() {
   const [data, setData] = useState([
     {
       // state to store the full data array
-      question: "What is your name?",
-      correctAnswer: "A",
+      question: "සර්ෆ් එක්සෙල් වලින් ඉවත්වන පැල්ලම් මේ අතරින් මොනවාද?",
+      correctAnswer: "D",
       options: [
-        { label: "A", value: "Jason" },
-        { label: "B", value: "Mark" },
-        { label: "C", value: "Steve" },
-        { label: "D", value: "Clark" },
+        { label: "A", value: "මඩ පැල්ලම්" },
+        { label: "B", value: "තීන්ත පැල්ලම්" },
+        { label: "C", value: "වියලි තද පැල්ලම්" },
+        { label: "D", value: "ඉහත සියල්ලම" },
       ],
     },
     {
-      question: "What is your age?",
-      correctAnswer: "B",
+      question:
+        "වෙනත් සාමාන්‍ය රෙදි සෝදන කුඩු ග්‍රෑම් 500 පැකට්ටුවක් රුපියල් 320 ත් 380ත් අතර වුවත් සර්ෆ් ඒක්සෙල් රෙදි සෝදන කුඩු ග්‍රෑම් 500 පැකට්ටුවක මිල කීයද?",
+      correctAnswer: "A",
       options: [
-        { label: "A", value: "61" },
-        { label: "B", value: "18" },
-        { label: "C", value: "53" },
-        { label: "D", value: "12" },
+        { label: "A", value: "රුපියල් 300යි" },
+        { label: "B", value: "රුපියල් 310යි" },
+        { label: "C", value: "රුපියල් 315යි" },
+        { label: "D", value: "රුපියල් 305යි" },
+      ],
+    },
+    {
+      question:
+        "රෙදි සේදීමේදී ඔබ අනුගමනය කල යුතු පියවරක්  නොවන්නේ මින් කුමක්ද?",
+      correctAnswer: "C",
+      options: [
+        { label: "A", value: "ඇඳුම්වල care label එක පරීක්ෂා කරන්න" },
+        { label: "B", value: "වර්ණ හා රෙදි වර්ගය අනුව ඇඳුම් වර්ග කරන්න." },
+        { label: "C", value: "සියලුම ඇඳුම් එකට ඩිටර්ජන්ට් එකට පොඟවා ගන්න." },
+        {
+          label: "D",
+          value:
+            "රෙදි සෝදන යන්ත්‍රයේ සදහන් කර ඇති උපරිම රෙදි ධාරිතාව පරීක්ෂා කරන්න",
+        },
       ],
     },
   ]);
@@ -39,21 +56,15 @@ export default function Page() {
   const [showIdle2, setShowIdle2] = useState(false); // bool to show the closing IDLE screen
   const [selectedOption, setSelectedOption] = useState(null); // state to store the selected option from the 4 answers
   const [selectedQuestion, setSelectedQuestion] = useState(null); // state to store the selected question object from the dropdown
-  const [questionTemp, setQuestionTemp] = useState({
+  const [questionTemp, setQuestionTemp] = useState(
     // state to temporary store the selected question object.(by dropdown or next/prev buttons)
-    question: "What is your name?",
-    correctAnswer: "A",
-    options: [
-      { label: "A", value: "Jason" },
-      { label: "B", value: "Mark" },
-      { label: "C", value: "Steve" },
-      { label: "D", value: "Clark" },
-    ],
-  });
+    data[0]
+  );
 
   const [question, setQuestion] = useState();
   const [questionIndex, setQuestionIndex] = useState(0); // state to store the index in the hard coded data object
   const [isActive, setIsActive] = useState(false); // bool to start the timer
+  const [timeIsOver, setTimeIsOver] = useState(false);
   const [scores, setScores] = useState([
     // state to store the scores of players with respective name/letter
     { player: "A", score: 0 },
@@ -64,10 +75,13 @@ export default function Page() {
     { player: "F", score: 0 },
   ]);
   const [lockedPlayer, setLockedPlayer] = useState(null); // State to track locked player
+  const [showScoreboard, setShowScoreboard] = useState(false);
+  const [showWinner, setShowWinner] = useState(false);
   console.log("selected question: ", selectedQuestion);
   console.log("Temp Question: ", questionTemp);
   console.log("Question : ", question);
   console.log("_________________________________________");
+  console.log("winner: ", showWinner);
 
   const reset = () => {
     // reset function
@@ -99,15 +113,24 @@ export default function Page() {
     setShowWrong(false);
     setShowIdle(false);
     setShowIdle2(false);
+    setShowScoreboard(false);
+    setShowWinner(false);
+    resetTimer();
   };
 
   const showCorretAnswer = () => {
     // show correct answer function
     setShowCorrect(true);
+    resetTimer();
+    const audio = new Audio("/sounds/correct.wav");
+    audio.play();
   };
   const showWrongAnswer = () => {
     // show wrong answer function
     setShowWrong(true);
+    resetTimer();
+    const audio = new Audio("/sounds/wrong.wav");
+    audio.play();
   };
   const displayIdle = () => {
     // show IDLE screen function
@@ -118,6 +141,9 @@ export default function Page() {
     setShowCorrect(false);
     setShowWrong(false);
     setSelectedOption(null);
+    setShowScoreboard(false);
+    setShowWinner(false);
+    resetTimer();
   };
 
   const handleChange = (event) => {
@@ -177,8 +203,10 @@ export default function Page() {
     // timer start function
     setIsActive(true);
   };
+
+  const [questionKey, setQuestionKey] = useState(0);
+
   const showQuestion = () => {
-    // show question screen function
     setShowIdle(false);
     setShowStartScreen(false);
     if (resetScreen) {
@@ -187,10 +215,29 @@ export default function Page() {
       setShowIdle2(true);
     }
     setQuestion(questionTemp);
+    setQuestionKey((prevKey) => prevKey + 1); // Update the key to re-trigger animation
+    setShowCorrect(false);
+    setShowWrong(false);
+    setIsActive(false);
+    setLockedPlayer(null); // Reset locked player
+    resetTimer();
+    setSelectedOption(null);
+  };
+
+  const [resetTrigger, setResetTrigger] = useState(0);
+
+  const resetTimer = () => {
+    setResetTrigger((prev) => prev + 1); // Update the resetTrigger to force a reset
+  };
+
+  const handleTimeFinished = () => {
+    setTimeIsOver(true); // Show the timeout message when the timer finishes
   };
 
   return (
-    <div className=" w-screen h-screen overflow-hidden flex flex-col justify-center items-center relative">
+    <div className="bg-blue-800 w-screen h-screen overflow-hidden flex flex-col justify-center items-center relative">
+      {/* Score Board */}
+      {showScoreboard && <Scoreboard scores={scores} showWinner={showWinner} />}
       {/*Left Menu */}
       <div className="flex flex-col absolute top-0 left-0 m-5 bg-white p-4 rounded-xl w-56 gap-4">
         {scores.map((member, index) => (
@@ -217,9 +264,23 @@ export default function Page() {
         ))}
       </div>
       {/*Right Menu */}
-      <div className="flex flex-col gap-5 absolute top-0 right-0 m-5 overflow-scroll max-h-screen">
+      <div className="flex flex-col gap-5 absolute z-20 top-0 right-0 m-5 overflow-scroll max-h-screen">
         <div className="flex flex-col bg-white p-4 rounded-xl w-56 gap-4">
           {/* IDLE Button */}
+          <button
+            className="w-full bg-blue-500 text-white font-semibold rounded-lg p-2 active:scale-90 transition"
+            onClick={() => {
+              setShowScoreboard((prevState) => !prevState);
+            }}>
+            {showScoreboard ? "Close SB" : "Show SB"}
+          </button>
+          {showScoreboard && (
+            <button
+              className="w-full bg-yellow-500 text-white font-semibold rounded-lg p-2 active:scale-90 transition"
+              onClick={() => setShowWinner(true)}>
+              Show Winner
+            </button>
+          )}
           <button
             className="w-full bg-green-500 text-white font-semibold rounded-lg p-2 active:scale-90 transition"
             onClick={displayIdle}>
@@ -353,7 +414,7 @@ export default function Page() {
                   initial={{ scale: 1 }} // Start scale
                   animate={{ scale: 0 }} // End scale
                   transition={{ duration: 1, ease: "easeInOut" }} // Animation settings
-                  className="absolute z-10">
+                  className="absolute">
                   <Image
                     src={"/surfexcel_logo.png"}
                     width={700}
@@ -366,7 +427,7 @@ export default function Page() {
                   initial={{ scale: 1 }} // Start scale
                   animate={{ scale: 0 }} // End scale
                   transition={{ duration: 1, ease: "easeInOut" }} // Animation settings
-                  className="absolute z-10">
+                  className="absolute">
                   <Image
                     src={"/start_screen_logo.png"}
                     width={900}
@@ -375,7 +436,7 @@ export default function Page() {
                   />
                 </motion.div>
               )}
-              {/* Scores */}
+              {/* Scores
               <motion.div
                 className="flex justify-around items-center w-[1400px] h-44 rounded-b-3xl bg-white absolute"
                 initial={{ top: -180 }} // Start position above the screen
@@ -399,15 +460,29 @@ export default function Page() {
                     </p>
                   </div>
                 ))}
+              </motion.div> */}
+              <motion.div
+                initial={{ scale: 0 }} // Start scale
+                animate={{ scale: 1 }} // End scale
+                transition={{ duration: 1, ease: "easeInOut" }} // Animation settings
+                className="absolute -top-12">
+                <Image
+                  src={"/start_screen_logo.png"}
+                  width={350}
+                  height={350}
+                  alt="surfexcel logo"
+                />
               </motion.div>
 
+              {/* Question and answers */}
               {question && (
                 <>
                   <div>
                     {/* Display Current Question */}
                     <div className="flex flex-col gap-10">
                       <motion.div
-                        className="bg-white w-[1200px] h-44 rounded-3xl flex justify-center items-center text-center text-4xl"
+                        key={`question-${questionKey}`} // Use the dynamic key
+                        className="bg-white w-[1200px] h-44 rounded-3xl flex justify-center items-center text-center text-blue-800 text-4xl font-semibold"
                         initial={{ opacity: 0 }} // Initial state: fully transparent
                         animate={{ opacity: 1 }} // Final state: fully opaque
                         transition={{ duration: 0.5, delay: 2 }} // 2-second delay before animation starts
@@ -416,65 +491,107 @@ export default function Page() {
                       </motion.div>
 
                       {/* Options */}
-                      <div className="flex flex-wrap justify-between w-[1200px] gap-10">
-                        {question &&  question.options.map((option, optionIndex) => (
-                          <motion.div
-                            className="flex justify-center items-center relative"
-                            key={optionIndex}
-                            initial={{ opacity: 0 }} // Initial state: invisible
-                            animate={{ opacity: 1 }} // Final state: fully visible
-                            transition={{
-                              duration: 0.5, // Animation duration
-                              delay: 3 + optionIndex * 0.2, // Add staggered delay for each option
-                            }}>
-                            {!showCorrect &&
-                              !showWrong &&
-                              selectedOption === option.label && (
-                                <motion.div
-                                  className="bg-pink-300 absolute"
-                                  initial={{
-                                    width: "498px", // Initial width
-                                    height: "78px", // Initial height
-                                    borderRadius: "12px", // Initial border radius
-                                  }}
-                                  animate={{
-                                    width: ["498px", "520px", "498px"], // Animates width
-                                    height: ["78px", "100px", "78px"], // Animates height
-                                    borderRadius: ["12px", "16px", "12px"], // Animates border radius
-                                  }}
-                                  transition={{
-                                    duration: 1, // Total duration for one full cycle
-                                    repeat: Infinity, // Repeats infinitely
-                                    repeatType: "loop", // Loops the animation seamlessly
-                                  }}
-                                />
-                              )}
+                      <div className="flex flex-wrap justify-between w-[1200px] gap-10 font-semibold">
+                        {question &&
+                          question.options.map((option, optionIndex) => (
+                            <motion.div
+                              className="flex justify-center items-center relative"
+                              key={`option-${questionKey}-${optionIndex}`} // Use a unique key for each option
+                              initial={{ opacity: 0 }} // Initial state: invisible
+                              animate={{ opacity: 1 }} // Final state: fully visible
+                              transition={{
+                                duration: 0.5, // Animation duration
+                                delay: 3 + optionIndex * 0.2, // Add staggered delay for each option
+                              }}>
+                              {!showCorrect &&
+                                !showWrong &&
+                                selectedOption === option.label && (
+                                  <motion.div
+                                    className="bg-pink-300 absolute"
+                                    initial={{
+                                      width: "498px", // Initial width
+                                      height: "78px", // Initial height
+                                      borderRadius: "12px", // Initial border radius
+                                    }}
+                                    animate={{
+                                      width: ["498px", "520px", "498px"], // Animates width
+                                      height: ["78px", "100px", "78px"], // Animates height
+                                      borderRadius: ["12px", "16px", "12px"], // Animates border radius
+                                    }}
+                                    transition={{
+                                      duration: 1, // Total duration for one full cycle
+                                      repeat: Infinity, // Repeats infinitely
+                                      repeatType: "loop", // Loops the animation seamlessly
+                                    }}
+                                  />
+                                )}
 
-                            <div
-                              className={`${
-                                showCorrect &&
-                                question && question.correctAnswer === option.label &&
-                                selectedOption === option.label
-                                  ? "bg-green-500 text-white scale-up" // Apply green background when showCorrect is true
-                                  : showWrong &&
-                                    question.correctAnswer !== option.label &&
-                                    selectedOption === option.label
-                                  ? "bg-red-500 text-white scale-up" // Apply red background when showWrong is true and answer is incorrect
-                                  : selectedOption === option.label
-                                  ? "bg-pink-400 text-white" // Apply pink background when selectedOption matches
-                                  : "bg-white" // Default background when neither condition is true
-                                // Default background when neither condition is true
-                              }  w-[500px] h-[80px] rounded-xl text-2xl flex relative items-center pl-10 gap-10`}>
-                              <p>{option.label}.</p>
-                              <p>{option.value}</p>
-                            </div>
-                          </motion.div>
-                        ))}
+                              <div
+                                className={`${
+                                  showCorrect &&
+                                  question &&
+                                  question.correctAnswer === option.label
+                                    ? "bg-green-500 text-white scale-up" // Apply green background when showCorrect is true
+                                    : showWrong &&
+                                      question.correctAnswer !== option.label &&
+                                      selectedOption === option.label
+                                    ? "bg-red-500 text-white scale-up" // Apply red background when showWrong is true and answer is incorrect
+                                    : selectedOption === option.label
+                                    ? "bg-pink-400 text-white" // Apply pink background when selectedOption matches
+                                    : "bg-white text-pink-700" // Default background when neither condition is true
+                                  // Default background when neither condition is true
+                                }  w-[500px] h-[80px] rounded-xl text-3xl flex relative items-center pl-10 gap-10`}>
+                                <p>{option.label}.</p>
+                                <p>{option.value}</p>
+                              </div>
+                            </motion.div>
+                          ))}
                       </div>
                     </div>
                   </div>
-                  {/* Question and answers */}
-                  <Timer isActive={isActive} />
+
+                  {/* Timer */}
+                  {showCorrect ? (
+                    <motion.div
+                      initial={{ scale: 0 }} // Start scale
+                      animate={{ scale: 1 }} // End scale
+                      transition={{ duration: 0.5, ease: "easeInOut" }} // Animation settings
+                      className="absolute bottom-10">
+                      <Image
+                        src={"/correct.png"}
+                        width={700}
+                        height={700}
+                        alt="correct answer text"
+                      />
+                    </motion.div>
+                  ) : showWrong ? (
+                    <motion.div
+                      initial={{ scale: 0 }} // Start scale
+                      animate={{ scale: 1 }} // End scale
+                      transition={{ duration: 0.5, ease: "easeInOut" }} // Animation settings
+                      className="absolute bottom-10">
+                      <Image
+                        src={"/wrong.png"}
+                        width={700}
+                        height={700}
+                        alt="wrong answer text"
+                      />
+                    </motion.div>
+                  ) : timeIsOver ? (
+                    <Image
+                      src={"/timeup.png"}
+                      width={500}
+                      height={500}
+                      alt="time's up text"
+                      className="absolute bottom-10 shake"
+                    />
+                  ) : (
+                    <Timer
+                      isActive={isActive}
+                      onTimeFinished={handleTimeFinished}
+                      resetTrigger={resetTrigger} // Pass resetTrigger to Timer
+                    />
+                  )}
                 </>
               )}
             </>
