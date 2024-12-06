@@ -7,30 +7,30 @@ import { motion } from "framer-motion";
 import Timer from "./components/Timer";
 import Image from "next/image";
 
-const data = [
-  {
-    question: "What is your name?",
-    correctAnswer: "A",
-    options: [
-      { label: "A", value: "Jason" },
-      { label: "B", value: "Mark" },
-      { label: "C", value: "Steve" },
-      { label: "D", value: "Clark" },
-    ],
-  },
-  {
-    question: "What is your age?",
-    correctAnswer: "B",
-    options: [
-      { label: "A", value: "61" },
-      { label: "B", value: "18" },
-      { label: "C", value: "53" },
-      { label: "D", value: "12" },
-    ],
-  },
-];
-
 export default function Page() {
+  const [data, setData] = useState([
+    {
+      // state to store the full data array
+      question: "What is your name?",
+      correctAnswer: "A",
+      options: [
+        { label: "A", value: "Jason" },
+        { label: "B", value: "Mark" },
+        { label: "C", value: "Steve" },
+        { label: "D", value: "Clark" },
+      ],
+    },
+    {
+      question: "What is your age?",
+      correctAnswer: "B",
+      options: [
+        { label: "A", value: "61" },
+        { label: "B", value: "18" },
+        { label: "C", value: "53" },
+        { label: "D", value: "12" },
+      ],
+    },
+  ]);
   const [showStartScreen, setShowStartScreen] = useState(true); // bool to show the start screen image/ reset image
   const [showCorrect, setShowCorrect] = useState(false); // bool to show the correct answer
   const [showWrong, setShowWrong] = useState(false); // bool to show the wrong answer
@@ -51,17 +51,7 @@ export default function Page() {
     ],
   });
 
-  const [question, setQuestion] = useState({
-    // state to store the final question object which is used to display the question and answers
-    question: "What is your name?",
-    correctAnswer: "A",
-    options: [
-      { label: "A", value: "Jason" },
-      { label: "B", value: "Mark" },
-      { label: "C", value: "Steve" },
-      { label: "D", value: "Clark" },
-    ],
-  });
+  const [question, setQuestion] = useState();
   const [questionIndex, setQuestionIndex] = useState(0); // state to store the index in the hard coded data object
   const [isActive, setIsActive] = useState(false); // bool to start the timer
   const [scores, setScores] = useState([
@@ -296,8 +286,8 @@ export default function Page() {
             </select>
           </div>
           <div className="flex flex-col gap-2">
-            <p>Q : {question.question}</p>
-            <p>A : {question.correctAnswer}</p>
+            <p>Q : {question && question.question}</p>
+            <p>A : {question && question.correctAnswer}</p>
           </div>
           <button
             onClick={showCorretAnswer}
@@ -411,78 +401,82 @@ export default function Page() {
                 ))}
               </motion.div>
 
-              {/* Question and answers */}
-              <div>
-                {/* Display Current Question */}
-                <div className="flex flex-col gap-10">
-                  <motion.div
-                    className="bg-white w-[1200px] h-44 rounded-3xl flex justify-center items-center text-center text-4xl"
-                    initial={{ opacity: 0 }} // Initial state: fully transparent
-                    animate={{ opacity: 1 }} // Final state: fully opaque
-                    transition={{ duration: 0.5, delay: 2 }} // 2-second delay before animation starts
-                  >
-                    <h3>{question.question}</h3>
-                  </motion.div>
-
-                  {/* Options */}
-                  <div className="flex flex-wrap justify-between w-[1200px] gap-10">
-                    {question.options.map((option, optionIndex) => (
+              {question && (
+                <>
+                  <div>
+                    {/* Display Current Question */}
+                    <div className="flex flex-col gap-10">
                       <motion.div
-                        className="flex justify-center items-center relative"
-                        key={optionIndex}
-                        initial={{ opacity: 0 }} // Initial state: invisible
-                        animate={{ opacity: 1 }} // Final state: fully visible
-                        transition={{
-                          duration: 0.5, // Animation duration
-                          delay: 3 + optionIndex * 0.2, // Add staggered delay for each option
-                        }}>
-                        {!showCorrect &&
-                          !showWrong &&
-                          selectedOption === option.label && (
-                            <motion.div
-                              className="bg-pink-300 absolute"
-                              initial={{
-                                width: "498px", // Initial width
-                                height: "78px", // Initial height
-                                borderRadius: "12px", // Initial border radius
-                              }}
-                              animate={{
-                                width: ["498px", "520px", "498px"], // Animates width
-                                height: ["78px", "100px", "78px"], // Animates height
-                                borderRadius: ["12px", "16px", "12px"], // Animates border radius
-                              }}
-                              transition={{
-                                duration: 1, // Total duration for one full cycle
-                                repeat: Infinity, // Repeats infinitely
-                                repeatType: "loop", // Loops the animation seamlessly
-                              }}
-                            />
-                          )}
-
-                        <div
-                          className={`${
-                            showCorrect &&
-                            question.correctAnswer === option.label &&
-                            selectedOption === option.label
-                              ? "bg-green-500 text-white scale-up" // Apply green background when showCorrect is true
-                              : showWrong &&
-                                question.correctAnswer !== option.label &&
-                                selectedOption === option.label
-                              ? "bg-red-500 text-white scale-up" // Apply red background when showWrong is true and answer is incorrect
-                              : selectedOption === option.label
-                              ? "bg-pink-400 text-white" // Apply pink background when selectedOption matches
-                              : "bg-white" // Default background when neither condition is true
-                            // Default background when neither condition is true
-                          }  w-[500px] h-[80px] rounded-xl text-2xl flex relative items-center pl-10 gap-10`}>
-                          <p>{option.label}.</p>
-                          <p>{option.value}</p>
-                        </div>
+                        className="bg-white w-[1200px] h-44 rounded-3xl flex justify-center items-center text-center text-4xl"
+                        initial={{ opacity: 0 }} // Initial state: fully transparent
+                        animate={{ opacity: 1 }} // Final state: fully opaque
+                        transition={{ duration: 0.5, delay: 2 }} // 2-second delay before animation starts
+                      >
+                        <h3>{question && question.question}</h3>
                       </motion.div>
-                    ))}
+
+                      {/* Options */}
+                      <div className="flex flex-wrap justify-between w-[1200px] gap-10">
+                        {question &&  question.options.map((option, optionIndex) => (
+                          <motion.div
+                            className="flex justify-center items-center relative"
+                            key={optionIndex}
+                            initial={{ opacity: 0 }} // Initial state: invisible
+                            animate={{ opacity: 1 }} // Final state: fully visible
+                            transition={{
+                              duration: 0.5, // Animation duration
+                              delay: 3 + optionIndex * 0.2, // Add staggered delay for each option
+                            }}>
+                            {!showCorrect &&
+                              !showWrong &&
+                              selectedOption === option.label && (
+                                <motion.div
+                                  className="bg-pink-300 absolute"
+                                  initial={{
+                                    width: "498px", // Initial width
+                                    height: "78px", // Initial height
+                                    borderRadius: "12px", // Initial border radius
+                                  }}
+                                  animate={{
+                                    width: ["498px", "520px", "498px"], // Animates width
+                                    height: ["78px", "100px", "78px"], // Animates height
+                                    borderRadius: ["12px", "16px", "12px"], // Animates border radius
+                                  }}
+                                  transition={{
+                                    duration: 1, // Total duration for one full cycle
+                                    repeat: Infinity, // Repeats infinitely
+                                    repeatType: "loop", // Loops the animation seamlessly
+                                  }}
+                                />
+                              )}
+
+                            <div
+                              className={`${
+                                showCorrect &&
+                                question && question.correctAnswer === option.label &&
+                                selectedOption === option.label
+                                  ? "bg-green-500 text-white scale-up" // Apply green background when showCorrect is true
+                                  : showWrong &&
+                                    question.correctAnswer !== option.label &&
+                                    selectedOption === option.label
+                                  ? "bg-red-500 text-white scale-up" // Apply red background when showWrong is true and answer is incorrect
+                                  : selectedOption === option.label
+                                  ? "bg-pink-400 text-white" // Apply pink background when selectedOption matches
+                                  : "bg-white" // Default background when neither condition is true
+                                // Default background when neither condition is true
+                              }  w-[500px] h-[80px] rounded-xl text-2xl flex relative items-center pl-10 gap-10`}>
+                              <p>{option.label}.</p>
+                              <p>{option.value}</p>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <Timer isActive={isActive} />
+                  {/* Question and answers */}
+                  <Timer isActive={isActive} />
+                </>
+              )}
             </>
           )}
         </>
