@@ -184,7 +184,7 @@ export default function Page() {
   };
 
   return (
-    <div className="bg-gray-800 w-screen h-screen overflow-hidden flex flex-col justify-center items-center relative">
+    <div className=" w-screen h-screen overflow-hidden flex flex-col justify-center items-center relative">
       {/*Left Menu */}
       <div className="flex flex-col absolute top-0 left-0 m-5 bg-white p-4 rounded-xl w-56 gap-4">
         {scores.map((member, index) => (
