@@ -31,15 +31,16 @@ const data = [
 ];
 
 export default function Page() {
-  const [showStartScreen, setShowStartScreen] = useState(true);
-  const [showCorrect, setShowCorrect] = useState(false);
-  const [showWrong, setShowWrong] = useState(false);
-  const [showIdle, setShowIdle] = useState(false);
-  const [resetScreen, setResetScreen] = useState(true); // idle *
-  const [showIdle2, setShowIdle2] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const [showStartScreen, setShowStartScreen] = useState(true); // bool to show the start screen image/ reset image
+  const [showCorrect, setShowCorrect] = useState(false); // bool to show the correct answer
+  const [showWrong, setShowWrong] = useState(false); // bool to show the wrong answer
+  const [showIdle, setShowIdle] = useState(false); // bool to show the opening IDLE screen
+  const [resetScreen, setResetScreen] = useState(true); // bool to show whether closing animation of start screen or IDLE screen
+  const [showIdle2, setShowIdle2] = useState(false); // bool to show the closing IDLE screen
+  const [selectedOption, setSelectedOption] = useState(null); // state to store the selected option from the 4 answers
+  const [selectedQuestion, setSelectedQuestion] = useState(null); // state to store the selected question object from the dropdown
   const [questionTemp, setQuestionTemp] = useState({
+    // state to temporary store the selected question object.(by dropdown or next/prev buttons)
     question: "What is your name?",
     correctAnswer: "A",
     options: [
@@ -51,6 +52,7 @@ export default function Page() {
   });
 
   const [question, setQuestion] = useState({
+    // state to store the final question object which is used to display the question and answers
     question: "What is your name?",
     correctAnswer: "A",
     options: [
@@ -60,9 +62,10 @@ export default function Page() {
       { label: "D", value: "Clark" },
     ],
   });
-  const [questionIndex, setQuestionIndex] = useState(0);
-  const [isActive, setIsActive] = useState(false);
+  const [questionIndex, setQuestionIndex] = useState(0); // state to store the index in the hard coded data object
+  const [isActive, setIsActive] = useState(false); // bool to start the timer
   const [scores, setScores] = useState([
+    // state to store the scores of players with respective name/letter
     { player: "A", score: 0 },
     { player: "B", score: 0 },
     { player: "C", score: 0 },
@@ -77,6 +80,7 @@ export default function Page() {
   console.log("_________________________________________");
 
   const reset = () => {
+    // reset function
     setResetScreen(true);
     setShowStartScreen(true);
     setIsActive(false);
@@ -108,12 +112,15 @@ export default function Page() {
   };
 
   const showCorretAnswer = () => {
+    // show correct answer function
     setShowCorrect(true);
   };
   const showWrongAnswer = () => {
+    // show wrong answer function
     setShowWrong(true);
   };
   const displayIdle = () => {
+    // show IDLE screen function
     setResetScreen(false);
     setShowIdle(true);
     setShowIdle2(true);
@@ -124,10 +131,12 @@ export default function Page() {
   };
 
   const handleChange = (event) => {
+    // function to select the option using dropdown
     setSelectedOption(event.target.value);
   };
 
   const goToNextQuestion = () => {
+    // navigate to the next question function
     if (questionIndex < data.length - 1) {
       const nextIndex = questionIndex + 1;
       setQuestionIndex(nextIndex);
@@ -136,6 +145,7 @@ export default function Page() {
   };
 
   const goToPreviousQuestion = () => {
+    // navigate to the previous question function
     if (questionIndex > 0) {
       const prevIndex = questionIndex - 1;
       setQuestionIndex(prevIndex);
@@ -144,6 +154,7 @@ export default function Page() {
   };
 
   const handleSelectQuestion = (event) => {
+    // function to select the question using dropdown
     const selectedIndex = parseInt(event.target.value); // Get the selected index
     setQuestionIndex(selectedIndex);
     setSelectedQuestion(data[selectedIndex]); // Update selectedQuestion for other potential uses
@@ -151,10 +162,13 @@ export default function Page() {
   };
 
   const handleLockPlayer = (player) => {
+    // function to lock the player
     setLockedPlayer(player); // Set the locked player when button is clicked
+    setIsActive(false);
   };
 
   const handleScoreChange = (index, increment) => {
+    // function to change the score of each player
     setScores((prevScores) => {
       return prevScores.map((member, idx) => {
         if (idx === index) {
@@ -170,9 +184,11 @@ export default function Page() {
   };
 
   const timerStart = () => {
+    // timer start function
     setIsActive(true);
   };
   const showQuestion = () => {
+    // show question screen function
     setShowIdle(false);
     setShowStartScreen(false);
     if (resetScreen) {
@@ -184,7 +200,7 @@ export default function Page() {
   };
 
   return (
-    <div className="bg-gray-800 w-screen h-screen overflow-hidden flex flex-col justify-center items-center relative">
+    <div className=" w-screen h-screen overflow-hidden flex flex-col justify-center items-center relative">
       {/*Left Menu */}
       <div className="flex flex-col absolute top-0 left-0 m-5 bg-white p-4 rounded-xl w-56 gap-4">
         {scores.map((member, index) => (
