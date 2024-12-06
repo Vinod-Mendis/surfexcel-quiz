@@ -149,6 +149,8 @@ export default function Page() {
   const handleChange = (event) => {
     // function to select the option using dropdown
     setSelectedOption(event.target.value);
+    const audio = new Audio("/sounds/lock_option.wav");
+    audio.play();
   };
 
   const goToNextQuestion = () => {
@@ -202,6 +204,8 @@ export default function Page() {
   const timerStart = () => {
     // timer start function
     setIsActive(true);
+    const audio = new Audio("/sounds/timer_sound.mp3");
+    audio.play();
   };
 
   const [questionKey, setQuestionKey] = useState(0);
@@ -235,7 +239,7 @@ export default function Page() {
   };
 
   return (
-    <div className="bg-blue-800 w-screen h-screen overflow-hidden flex flex-col justify-center items-center relative">
+    <div className="bg-gradient-to-bl from-blue-500  via-[#05004a] to-pink-200 w-screen h-screen overflow-hidden flex flex-col justify-center items-center relative">
       {/* Score Board */}
       {showScoreboard && <Scoreboard scores={scores} showWinner={showWinner} />}
       {/*Left Menu */}
@@ -461,37 +465,39 @@ export default function Page() {
                   </div>
                 ))}
               </motion.div> */}
-              <motion.div
+              {/* <motion.div
                 initial={{ scale: 0 }} // Start scale
                 animate={{ scale: 1 }} // End scale
                 transition={{ duration: 1, ease: "easeInOut" }} // Animation settings
                 className="absolute -top-12">
                 <Image
                   src={"/start_screen_logo.png"}
-                  width={350}
-                  height={350}
+                  width={250}
+                  height={250}
                   alt="surfexcel logo"
                 />
-              </motion.div>
+              </motion.div> */}
 
               {/* Question and answers */}
               {question && (
                 <>
-                  <div>
+                  <div className="absolute top-40">
                     {/* Display Current Question */}
                     <div className="flex flex-col gap-10">
                       <motion.div
                         key={`question-${questionKey}`} // Use the dynamic key
-                        className="bg-white w-[1200px] h-44 rounded-3xl flex justify-center items-center text-center text-blue-800 text-4xl font-semibold"
+                        className="bg-gradient-to-bl from-blue-300  to-[#0b00a8] w-[1200px] h-52  rounded-3xl flex justify-center items-center text-center text-white text-4xl font-semibold px-5 border-[4px] border-white shadow-2xl"
                         initial={{ opacity: 0 }} // Initial state: fully transparent
                         animate={{ opacity: 1 }} // Final state: fully opaque
                         transition={{ duration: 0.5, delay: 2 }} // 2-second delay before animation starts
                       >
-                        <h3>{question && question.question}</h3>
+                        <h3 className="leading-normal">
+                          {question && question.question}
+                        </h3>
                       </motion.div>
 
                       {/* Options */}
-                      <div className="flex flex-wrap justify-between w-[1200px] gap-10 font-semibold">
+                      <div className="flex flex-wrap justify-around w-[1200px] gap-5 font-semibold">
                         {question &&
                           question.options.map((option, optionIndex) => (
                             <motion.div
@@ -510,13 +516,13 @@ export default function Page() {
                                     className="bg-pink-300 absolute"
                                     initial={{
                                       width: "498px", // Initial width
-                                      height: "78px", // Initial height
-                                      borderRadius: "12px", // Initial border radius
+                                      height: "158px", // Initial height
+                                      borderRadius: "16px", // Initial border radius
                                     }}
                                     animate={{
                                       width: ["498px", "520px", "498px"], // Animates width
-                                      height: ["78px", "100px", "78px"], // Animates height
-                                      borderRadius: ["12px", "16px", "12px"], // Animates border radius
+                                      height: ["158px", "180px", "158px"], // Animates height
+                                      borderRadius: ["16px", "20px", "16px"], // Animates border radius
                                     }}
                                     transition={{
                                       duration: 1, // Total duration for one full cycle
@@ -537,10 +543,14 @@ export default function Page() {
                                       selectedOption === option.label
                                     ? "bg-red-500 text-white scale-up" // Apply red background when showWrong is true and answer is incorrect
                                     : selectedOption === option.label
-                                    ? "bg-pink-400 text-white" // Apply pink background when selectedOption matches
-                                    : "bg-white text-pink-700" // Default background when neither condition is true
+                                    ? "bg-gradient-to-bl from-pink-300  to-[#6e006e] text-white border-pink-400" // Apply pink background when selectedOption matches
+                                    : "bg-gradient-to-bl from-blue-300  to-[#0b00a8] text-white border-blue-800" // Default background when neither condition is true
                                   // Default background when neither condition is true
-                                }  w-[500px] h-[80px] rounded-xl text-3xl flex relative items-center pl-10 gap-10`}>
+                                } ${
+                                  option.value.length < 20
+                                    ? "text-4xl"
+                                    : "text-3xl"
+                                } border-[3px]  shadow-2xl  w-[500px] h-[160px] rounded-2xl  flex relative items-center pl-10 gap-10`}>
                                 <p>{option.label}.</p>
                                 <p>{option.value}</p>
                               </div>
