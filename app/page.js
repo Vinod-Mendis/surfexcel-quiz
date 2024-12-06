@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Timer from "./components/Timer";
 import Image from "next/image";
@@ -83,6 +83,30 @@ export default function Page() {
   console.log("_________________________________________");
   console.log("winner: ", showWinner);
 
+  const timerAudio = useRef(new Audio("/sounds/timer_sound.mp3"));
+
+  const playAudio = () => {
+    const audio = timerAudio.current;
+    if (audio) {
+      audio.play().catch((err) => console.error("Audio playback error:", err));
+    }
+  };
+
+  const pauseAudio = () => {
+    const audio = timerAudio.current;
+    if (audio) {
+      audio.pause(); // Pauses playback
+    }
+  };
+
+  const resetAudio = () => {
+    const audio = timerAudio.current;
+    if (audio) {
+      audio.pause(); // Pause playback
+      audio.currentTime = 0; // Reset to the beginning
+    }
+  };
+
   const reset = () => {
     // reset function
     setResetScreen(true);
@@ -116,6 +140,7 @@ export default function Page() {
     setShowScoreboard(false);
     setShowWinner(false);
     resetTimer();
+    resetAudio();
   };
 
   const showCorretAnswer = () => {
@@ -144,6 +169,7 @@ export default function Page() {
     setShowScoreboard(false);
     setShowWinner(false);
     resetTimer();
+    resetAudio();
   };
 
   const handleChange = (event) => {
@@ -183,6 +209,7 @@ export default function Page() {
     // function to lock the player
     setLockedPlayer(player); // Set the locked player when button is clicked
     setIsActive(false);
+    pauseAudio();
   };
 
   const handleScoreChange = (index, increment) => {
@@ -204,8 +231,7 @@ export default function Page() {
   const timerStart = () => {
     // timer start function
     setIsActive(true);
-    const audio = new Audio("/sounds/timer_sound.mp3");
-    audio.play();
+    playAudio();
   };
 
   const [questionKey, setQuestionKey] = useState(0);
