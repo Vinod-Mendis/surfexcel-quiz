@@ -593,7 +593,7 @@ export default function Page() {
   const handleLockPlayer = (player) => {
     // function to lock the player
     setLockedPlayer(player); // Set the locked player when button is clicked
-    // setIsActive(false);
+    setIsActive(false);
   };
 
   // const handleScoreChange = (index, increment) => {

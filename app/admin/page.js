@@ -583,8 +583,8 @@ export default function Page() {
     socket.emit("handleLockPlayerAdmin", player);
     // function to lock the player
     setLockedPlayer(player); // Set the locked player when button is clicked
-    // setIsActive(false);
-    // pauseAudio();
+    setIsActive(false);
+    pauseAudio();
   };
 
   const sendScores = () => {
@@ -657,148 +657,177 @@ export default function Page() {
   };
 
   return (
-    <div className="bg-blue-800 w-screen h-screen overflow-hidden flex flex-col justify-center items-center relative">
+    <div className="w-screen h-screen overflow-hidden flex justify-center items-center relative ">
       {/* Score Board */}
       {/* {showScoreboard && <Scoreboard scores={scores} showWinner={showWinner} />} */}
-      {/*Left Menu */}
-      <div className="flex flex-col absolute top-0 left-0 m-5 bg-white p-4 rounded-xl w-56 gap-4">
-        {scores.map((member, index) => (
-          <div
-            key={index}
-            className={`w-full flex flex-col gap-2 text-xl border-b pb-2 rounded-lg ${
-              lockedPlayer === member.player ? "bg-yellow-400" : "bg-white"
-            }`}>
-            <h1 className="font-semibold">{member.player} :</h1>
-            <div className="w-full flex gap-5 text-xl items-center">
-              <button
-                className="w-full bg-red-500 text-white font-semibold rounded-lg p-2 active:scale-90 transition"
-                onClick={() => handleScoreChange(index, false)}>
-                -
-              </button>
-              <p>{member.score}</p>
-              <button
-                className="w-full bg-green-500 text-white font-semibold rounded-lg p-2 active:scale-90 transition"
-                onClick={() => handleScoreChange(index, true)}>
-                +
-              </button>
+      <h1 className="font-extrabold text-pink-800 text-5xl absolute top-10">
+        Surf Excel - Dashboard
+      </h1>
+
+      <div className="flex gap-10">
+        {/*Left Menu */}
+        <div className="flex flex-col  bg-white p-4 rounded-xl w-96 gap-4 shadow-2xl">
+          <h1 className="font-semibold text-2xl">Change Score :</h1>
+          {scores.map((member, index) => (
+            <div
+              key={index}
+              className={`w-full flex flex-col gap-2 text-xl border-b pb-2 rounded-lg ${
+                lockedPlayer === member.player ? "bg-yellow-400" : "bg-white"
+              }`}>
+              <h1 className="font-semibold">{member.player} :</h1>
+              <div className="w-full flex gap-5 text-xl items-center">
+                <button
+                  className="w-full bg-red-500 text-white font-semibold rounded-lg p-2 hover:scale-105 hover:shadow-xl active:scale-90 transition"
+                  onClick={() => handleScoreChange(index, false)}>
+                  -
+                </button>
+                <p className="font-bold text-5xl">{member.score}</p>
+                <button
+                  className="w-full bg-green-500 text-white font-semibold rounded-lg p-2 hover:scale-105 hover:shadow-xl active:scale-90 transition"
+                  onClick={() => handleScoreChange(index, true)}>
+                  +
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+        {/*Right Menu */}
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-col bg-white p-4 rounded-xl  gap-10">
+            <h1 className="font-extrabold text-center text-3xl">
+              Main Controls
+            </h1>
+            <div className="w-full h-px bg-gray-300 rounded-full"></div>
+            <div className="flex gap-8">
+              <div className="flex flex-col gap-4">
+                <button
+                  className="w-full bg-blue-500 text-white font-semibold rounded-lg p-4 hover:scale-105 hover:shadow-xl active:scale-90 transition"
+                  onClick={() => {
+                    ShowScoreboard();
+                  }}>
+                  Show SB
+                </button>
+                {showScoreboard && (
+                  <button
+                    className="w-full bg-yellow-500 text-white font-semibold rounded-lg p-4 hover:scale-105 hover:shadow-xl active:scale-90 transition"
+                    onClick={() => {
+                      setShowWinner(true);
+                      ShowWinner();
+                    }}>
+                    Show Winner
+                  </button>
+                )}
+                <button
+                  className="w-full bg-green-500 text-white font-semibold rounded-lg p-4 hover:scale-105 hover:shadow-xl active:scale-90 transition"
+                  onClick={displayIdle}>
+                  IDLE / Close SB
+                </button>
+                {/* Reset Button */}
+                <button
+                  className="w-full bg-red-500 text-white font-semibold rounded-lg p-4 hover:scale-105 hover:shadow-xl active:scale-90 transition"
+                  onClick={reset}>
+                  Reset
+                </button>
+              </div>
+              <div className="h-full w-px bg-gray-300 rounded-full"></div>
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2 w-[400px] text-wrap">
+                  <p>Q : {questionTemp.question}</p>
+                  <p>A : {questionTemp.correctAnswer}</p>
+                </div>
+                {/* Dropdown to Select Question */}
+                <select
+                  onChange={handleSelectQuestion}
+                  value={questionIndex} // Sync with questionIndex
+                  className="bg-white rounded-lg p-3 text-xl border border-gray-300 shadow-lg w-full cursor-pointer">
+                  {data.map((_, index) => (
+                    <option key={index} value={index}>
+                      Question {index + 1}
+                    </option>
+                  ))}
+                </select>
+                <div className="flex gap-5">
+                  {/* Navigation Buttons */}
+                  <button
+                    onClick={goToPreviousQuestion}
+                    className="bg-blue-500 text-white px-4 p-4 rounded-lg disabled:opacity-50 shadow-lg w-full cursor-pointer hover:scale-105 hover:shadow-xl active:scale-90 transition"
+                    disabled={questionIndex === 0}>
+                    Previous
+                  </button>
+                  <button
+                    onClick={goToNextQuestion}
+                    className="bg-blue-500 text-white px-4 p-4 rounded-lg disabled:opacity-50 shadow-lg w-full cursor-pointer hover:scale-105 hover:shadow-xl active:scale-90 transition"
+                    disabled={questionIndex === data.length - 1}>
+                    Next
+                  </button>
+                </div>
+              </div>
+              <div className="h-full w-px bg-gray-300 rounded-full"></div>
+              <div className="flex flex-col gap-4">
+                <button
+                  onClick={showQuestion}
+                  className="bg-green-500 text-white px-4 p-4 rounded-lg disabled:opacity-50 shadow-lg w-full cursor-pointer hover:scale-105 hover:shadow-xl active:scale-90 transition">
+                  Show
+                </button>
+                <button
+                  onClick={timerStart}
+                  className="bg-yellow-500 text-white px-4 p-4 rounded-lg disabled:opacity-50 shadow-lg w-full cursor-pointer hover:scale-105 hover:shadow-xl active:scale-90 transition">
+                  Start Timer
+                </button>
+                <button
+                  onClick={timerStop}
+                  className="bg-red-500 text-white px-4 p-4 rounded-lg disabled:opacity-50 shadow-lg w-full cursor-pointer hover:scale-105 hover:shadow-xl active:scale-90 transition">
+                  Stop Timer
+                </button>
+              </div>
+            </div>
+            {/* IDLE Button */}
+            <div className="w-full h-px bg-gray-300 rounded-full"></div>
+            <div className="flex gap-5 w-full">
+              {/* Dropdown Menu for Selecting Option */}
+              <div className="flex flex-col gap-4 w-full">
+                <div>
+                  <select
+                    onChange={handleChange}
+                    className="bg-white rounded-lg p-3 text-xl border border-gray-300 shadow-lg w-full cursor-pointer">
+                    <option value="">Select an option</option>
+                    {data[questionIndex].options.map((option, optionIndex) => (
+                      <option key={optionIndex} value={option.label}>
+                        {option.label}. {option.value}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <p>Q : {question && question.question}</p>
+                  <p>A : {question && question.correctAnswer}</p>
+                </div>
+              </div>
+              <div className="h-full w-1 bg-gray-300 rounded-full"></div>
+              <div className="flex flex-col gap-4 w-full">
+                <button
+                  onClick={showCorretAnswer}
+                  className="bg-green-500 text-white px-4 py-4 rounded-lg disabled:opacity-50 shadow-lg w-full cursor-pointer hover:scale-105 hover:shadow-xl active:scale-90 transition">
+                  Correct
+                </button>
+                <button
+                  onClick={showWrongAnswer}
+                  className="bg-red-500 text-white px-4 py-4 rounded-lg disabled:opacity-50 shadow-lg w-full cursor-pointer hover:scale-105 hover:shadow-xl active:scale-90 transition">
+                  Wrong
+                </button>
+              </div>
             </div>
           </div>
-        ))}
-      </div>
-      {/*Right Menu */}
-      <div className="flex flex-col gap-5 absolute z-20 top-0 right-0 m-5 overflow-scroll max-h-screen">
-        <div className="flex flex-col bg-white p-4 rounded-xl w-56 gap-4">
-          {/* IDLE Button */}
-          <button
-            className="w-full bg-blue-500 text-white font-semibold rounded-lg p-2 active:scale-90 transition"
-            onClick={() => {
-              ShowScoreboard();
-            }}>
-            Show SB
-          </button>
-          {showScoreboard && (
-            <button
-              className="w-full bg-yellow-500 text-white font-semibold rounded-lg p-2 active:scale-90 transition"
-              onClick={() => {
-                setShowWinner(true);
-                ShowWinner();
-              }}>
-              Show Winner
-            </button>
-          )}
-          <button
-            className="w-full bg-green-500 text-white font-semibold rounded-lg p-2 active:scale-90 transition"
-            onClick={displayIdle}>
-            IDLE / Close SB
-          </button>
-          {/* Reset Button */}
-          <button
-            className="w-full bg-red-500 text-white font-semibold rounded-lg p-2 active:scale-90 transition"
-            onClick={reset}>
-            Reset
-          </button>
-          <div className="flex flex-col gap-2">
-            <p>Q : {questionTemp.question}</p>
-            <p>A : {questionTemp.correctAnswer}</p>
-          </div>
-          {/* Dropdown to Select Question */}
-          <select
-            onChange={handleSelectQuestion}
-            value={questionIndex} // Sync with questionIndex
-            className="bg-white rounded-lg p-3 text-xl border border-gray-300 shadow-lg w-full cursor-pointer">
-            {data.map((_, index) => (
-              <option key={index} value={index}>
-                Question {index + 1}
-              </option>
-            ))}
-          </select>
-
-          <div className="flex gap-5">
-            {/* Navigation Buttons */}
-            <button
-              onClick={goToPreviousQuestion}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg disabled:opacity-50 shadow-lg w-full cursor-pointer active:scale-90 transition"
-              disabled={questionIndex === 0}>
-              Previous
-            </button>
-            <button
-              onClick={goToNextQuestion}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg disabled:opacity-50 shadow-lg w-full cursor-pointer active:scale-90 transition"
-              disabled={questionIndex === data.length - 1}>
-              Next
-            </button>
-          </div>
-          <button
-            onClick={showQuestion}
-            className="bg-green-500 text-white px-4 py-2 rounded-lg disabled:opacity-50 shadow-lg w-full cursor-pointer active:scale-90 transition">
-            Show
-          </button>
-          <button
-            onClick={timerStart}
-            className="bg-yellow-500 text-white px-4 py-2 rounded-lg disabled:opacity-50 shadow-lg w-full cursor-pointer active:scale-90 transition">
-            Start Timer
-          </button>
-          <button
-            onClick={timerStop}
-            className="bg-red-500 text-white px-4 py-2 rounded-lg disabled:opacity-50 shadow-lg w-full cursor-pointer active:scale-90 transition">
-            Stop Timer
-          </button>
-          {/* Dropdown Menu for Selecting Option */}
-          <div>
-            <select
-              onChange={handleChange}
-              className="bg-white rounded-lg p-3 text-xl border border-gray-300 shadow-lg w-full cursor-pointer">
-              <option value="">Select an option</option>
-              {data[questionIndex].options.map((option, optionIndex) => (
-                <option key={optionIndex} value={option.label}>
-                  {option.label}. {option.value}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex flex-col gap-2">
-            <p>Q : {question && question.question}</p>
-            <p>A : {question && question.correctAnswer}</p>
-          </div>
-          <button
-            onClick={showCorretAnswer}
-            className="bg-green-500 text-white px-4 py-2 rounded-lg disabled:opacity-50 shadow-lg w-full cursor-pointer active:scale-90 transition">
-            Correct
-          </button>
-          <button
-            onClick={showWrongAnswer}
-            className="bg-red-500 text-white px-4 py-2 rounded-lg disabled:opacity-50 shadow-lg w-full cursor-pointer active:scale-90 transition">
-            Wrong
-          </button>
         </div>
-        <div className="flex flex-col bg-white p-4 rounded-xl w-56 gap-4">
+        {/* Lock player menu */}
+        <div className="flex flex-col bg-white p-4 rounded-xl w-96 gap-8  shadow-2xl">
           {/* Lock Player */}
           <h1 className="font-semibold text-xl">Lock Player</h1>
           {scores.map((member, index) => (
             <button
               key={index}
               onClick={() => handleLockPlayer(member.player)} // Lock the player
-              className={`w-full font-semibold rounded-lg p-2 active:scale-90 transition ${
+              className={`w-full font-semibold rounded-lg p-4 hover:scale-105 hover:shadow-xl active:scale-90 transition ${
                 lockedPlayer === member.player
                   ? "bg-yellow-600 text-white" // Highlight locked player
                   : "bg-yellow-500 text-white"
