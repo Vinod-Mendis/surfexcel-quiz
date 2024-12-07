@@ -151,44 +151,44 @@ const io = new Server(httpServer, {
   },
 });
 
-// Configure serial port (make sure to change this to the correct port for your system)
-const serialPort = new SerialPort({
-  path: 'COM5', // replace with your correct COM port
-  baudRate: 9600,
-});
+// // Configure serial port (make sure to change this to the correct port for your system)
+// const serialPort = new SerialPort({
+//   path: 'COM5', // replace with your correct COM port
+//   baudRate: 9600,
+// });
 
 
-// Listen for data from the Arduino through the serial port
-serialPort.on('open', () => {
-  console.log('Serial port opened.');
-});
+// // Listen for data from the Arduino through the serial port
+// serialPort.on('open', () => {
+//   console.log('Serial port opened.');
+// });
 
-// Handle incoming data from Arduino
-serialPort.on('data', (data) => {
-  const dataString = data.toString();
-  console.log('Data received from Arduino:', dataString);
+// // Handle incoming data from Arduino
+// serialPort.on('data', (data) => {
+//   const dataString = data.toString();
+//   console.log('Data received from Arduino:', dataString);
 
-  // Process the received data
-  // if (dataString.trim() === '1') {
-  //   console.log('Button 1 pressed');
-  // } else if (dataString.trim() === '2') {
-  //   console.log('Button 2 pressed');
-  // } else if (dataString.trim() === '3') {
-  //   console.log('Button 3 pressed');
-  // } else if (dataString.trim() === '4') {
-  //   console.log('Button 4 pressed');
-  // } else if (dataString.trim() === '5') {
-  //   console.log('Button 5 pressed');
-  // } else if (dataString.trim() === '6') {
-  //   console.log('Button 6 pressed');
-  // } else {
-  //   console.log('Unknown data received:', dataString);
-  // }
-  io.emit('buttonPressed', { rawData: dataString });
-  // Send the response back to the client
-  // Here you can send real-time notifications or status updates to the front end
-  // For example, through a WebSocket or update a database
-});
+//   // Process the received data
+//   // if (dataString.trim() === '1') {
+//   //   console.log('Button 1 pressed');
+//   // } else if (dataString.trim() === '2') {
+//   //   console.log('Button 2 pressed');
+//   // } else if (dataString.trim() === '3') {
+//   //   console.log('Button 3 pressed');
+//   // } else if (dataString.trim() === '4') {
+//   //   console.log('Button 4 pressed');
+//   // } else if (dataString.trim() === '5') {
+//   //   console.log('Button 5 pressed');
+//   // } else if (dataString.trim() === '6') {
+//   //   console.log('Button 6 pressed');
+//   // } else {
+//   //   console.log('Unknown data received:', dataString);
+//   // }
+//   io.emit('buttonPressed', { rawData: dataString });
+//   // Send the response back to the client
+//   // Here you can send real-time notifications or status updates to the front end
+//   // For example, through a WebSocket or update a database
+// });
 
 
 // API Endpoint to fetch questions
