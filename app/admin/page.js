@@ -454,7 +454,7 @@ export default function Page() {
   }, [data]);
 
   const ShowScoreboard = () => {
-    setShowScoreboard((prevState) => !prevState);
+    setShowScoreboard(true);
     socket.emit("showScoreboardAdmin", (!showScoreboard, scores));
   };
 
@@ -507,6 +507,7 @@ export default function Page() {
     resetTimer();
     const audio = new Audio("/sounds/correct.wav");
     audio.play();
+    pauseAudio();
   };
   const showWrongAnswer = () => {
     socket.emit("showWrongAnswerAdmin");
@@ -515,6 +516,7 @@ export default function Page() {
     resetTimer();
     const audio = new Audio("/sounds/wrong.wav");
     audio.play();
+    pauseAudio();
   };
   const displayIdle = () => {
     socket.emit("displayIdleAdmin");
@@ -581,8 +583,8 @@ export default function Page() {
     socket.emit("handleLockPlayerAdmin", player);
     // function to lock the player
     setLockedPlayer(player); // Set the locked player when button is clicked
-    setIsActive(false);
-    pauseAudio();
+    // setIsActive(false);
+    // pauseAudio();
   };
 
   const sendScores = () => {
@@ -590,9 +592,8 @@ export default function Page() {
   };
 
   const handleScoreChange = (index, increment) => {
-    // function to change the score of each player
     setScores((prevScores) => {
-      return prevScores.map((member, idx) => {
+      const newScores = prevScores.map((member, idx) => {
         if (idx === index) {
           // Increment or decrement the score by 20
           const newScore = increment
@@ -602,8 +603,11 @@ export default function Page() {
         }
         return member;
       });
+
+      // Emit the new scores array immediately after updating
+      socket.emit("handleScoreChangeAdmin", newScores);
+      return newScores;
     });
-    sendScores();
   };
 
   const timerStart = () => {
@@ -611,6 +615,12 @@ export default function Page() {
     // timer start function
     // setIsActive(true);
     playAudio();
+  };
+
+  const timerStop = () => {
+    setIsActive(false);
+    pauseAudio();
+    socket.emit("timerStop");
   };
 
   const [questionKey, setQuestionKey] = useState(0);
@@ -649,7 +659,7 @@ export default function Page() {
   return (
     <div className="bg-blue-800 w-screen h-screen overflow-hidden flex flex-col justify-center items-center relative">
       {/* Score Board */}
-      {showScoreboard && <Scoreboard scores={scores} showWinner={showWinner} />}
+      {/* {showScoreboard && <Scoreboard scores={scores} showWinner={showWinner} />} */}
       {/*Left Menu */}
       <div className="flex flex-col absolute top-0 left-0 m-5 bg-white p-4 rounded-xl w-56 gap-4">
         {scores.map((member, index) => (
@@ -684,7 +694,7 @@ export default function Page() {
             onClick={() => {
               ShowScoreboard();
             }}>
-            {showScoreboard ? "Close SB" : "Show SB"}
+            Show SB
           </button>
           {showScoreboard && (
             <button
@@ -699,7 +709,7 @@ export default function Page() {
           <button
             className="w-full bg-green-500 text-white font-semibold rounded-lg p-2 active:scale-90 transition"
             onClick={displayIdle}>
-            IDLE
+            IDLE / Close SB
           </button>
           {/* Reset Button */}
           <button
@@ -747,6 +757,11 @@ export default function Page() {
             onClick={timerStart}
             className="bg-yellow-500 text-white px-4 py-2 rounded-lg disabled:opacity-50 shadow-lg w-full cursor-pointer active:scale-90 transition">
             Start Timer
+          </button>
+          <button
+            onClick={timerStop}
+            className="bg-red-500 text-white px-4 py-2 rounded-lg disabled:opacity-50 shadow-lg w-full cursor-pointer active:scale-90 transition">
+            Stop Timer
           </button>
           {/* Dropdown Menu for Selecting Option */}
           <div>

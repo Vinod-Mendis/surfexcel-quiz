@@ -469,8 +469,13 @@ export default function Page() {
     handleLockPlayer(data);
   });
 
-  socket.on("handleScoreChangeServer", (score) => {
-    handleScoreChange(score);
+  socket.on("handleScoreChangeServer", (newScores) => {
+    // Simply update with the new scores array
+    setScores(newScores);
+  });
+
+  socket.on("timerStop", () => {
+    setIsActive(false);
   });
 
   // useEffect(() => {
@@ -588,7 +593,7 @@ export default function Page() {
   const handleLockPlayer = (player) => {
     // function to lock the player
     setLockedPlayer(player); // Set the locked player when button is clicked
-    setIsActive(false);
+    // setIsActive(false);
   };
 
   // const handleScoreChange = (index, increment) => {

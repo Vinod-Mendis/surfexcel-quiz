@@ -1,3 +1,5 @@
+/** @format */
+
 // // Import the required library correctly
 // const { SerialPort } = require('serialport');
 // const express = require('express');
@@ -64,7 +66,6 @@
 // //   // For example, through a WebSocket or update a database
 // // });
 
-
 // app.get("/questions", (req, res) => {
 //   const workbook = xlsx.readFile("quiz_questions.xlsx");
 
@@ -108,7 +109,6 @@
 //   res.json({ level03: level03Data });
 // });
 
-
 // io.on('connection',(socket) =>{
 //   console.log('Admin or client connected');
 
@@ -117,23 +117,19 @@
 //     io.emit('handleSelectQuestionServer', data);
 //   })
 
-
 // })
-
 
 // // Handle server start
 // app.listen(port, () => {
 //   console.log(`Server listening at http://localhost:${port}`);
 // });
 
-
-
-const express = require('express');
-const { SerialPort } = require('serialport');
+const express = require("express");
+const { SerialPort } = require("serialport");
 const xlsx = require("xlsx");
 const cors = require("cors");
-const { createServer } = require('http');
-const { Server } = require('socket.io');
+const { createServer } = require("http");
+const { Server } = require("socket.io");
 
 const app = express();
 const port = 3002;
@@ -156,7 +152,6 @@ const io = new Server(httpServer, {
 //   path: 'COM5', // replace with your correct COM port
 //   baudRate: 9600,
 // });
-
 
 // // Listen for data from the Arduino through the serial port
 // serialPort.on('open', () => {
@@ -190,7 +185,6 @@ const io = new Server(httpServer, {
 //   // For example, through a WebSocket or update a database
 // });
 
-
 // API Endpoint to fetch questions
 app.get("/questions", (req, res) => {
   const workbook = xlsx.readFile("quiz_questions.xlsx");
@@ -211,84 +205,89 @@ app.get("/questions", (req, res) => {
 });
 
 // Socket.io setup
-io.on('connection', (socket) => {
-  console.log('Admin or client connected:', socket.id);
+io.on("connection", (socket) => {
+  console.log("Admin or client connected:", socket.id);
 
   // Admin selects a question
-  socket.on('handleSelectQuestionAdmin', (data) => {
-    console.log('Question selected by admin:', data);
+  socket.on("handleSelectQuestionAdmin", (data) => {
+    console.log("Question selected by admin:", data);
 
     // Broadcast the selected question to all clients
-    io.emit('handleSelectQuestionServer', data);
+    io.emit("handleSelectQuestionServer", data);
   });
 
-  socket.on('showQuestionAdmin',() => {
-    console.log('Question show btn admin');
-    io.emit('showQuestionServer')
-  })
+  socket.on("timerStop", () => {
+    console.log("Timer stop");
+    io.emit("timerStop");
+  });
 
-  socket.on('showScoreboardAdmin', (boolean, score) => {
-    console.log('Scoreboard show btn admin');
-    io.emit('showScoreboardServer',boolean, score)
-  })
+  socket.on("showQuestionAdmin", () => {
+    console.log("Question show btn admin");
+    io.emit("showQuestionServer");
+  });
 
-  socket.on('showWinner', () => {
-    console.log('Winner display btn admin');
-    io.emit('showWinnerServer')
-  })
+  socket.on("showScoreboardAdmin", (boolean, score) => {
+    console.log("Scoreboard show btn admin");
+    io.emit("showScoreboardServer", boolean, score);
+  });
 
-  socket.on('resetBtnAdmin', () => {
-    console.log('Reset btn admin');
-    io.emit('resetBtnServer')
-  })
+  socket.on("showWinner", () => {
+    console.log("Winner display btn admin");
+    io.emit("showWinnerServer");
+  });
 
-  socket.on('displayIdleAdmin', () => {
-    console.log('Idle display btn admin');
-    io.emit('displayIdleServer')
-  })
+  socket.on("resetBtnAdmin", () => {
+    console.log("Reset btn admin");
+    io.emit("resetBtnServer");
+  });
 
-  socket.on('goToPreviousQuestionAdmin', () => {
-    console.log('Previous question btn admin');
-    io.emit('goToPreviousQuestionServer')
-  })
+  socket.on("displayIdleAdmin", () => {
+    console.log("Idle display btn admin");
+    io.emit("displayIdleServer");
+  });
 
-  socket.on('goToNextQuestionAdmin', () => {
-    console.log('Next question btn admin');
-    io.emit('goToNextQuestionServer')
-  })
+  socket.on("goToPreviousQuestionAdmin", () => {
+    console.log("Previous question btn admin");
+    io.emit("goToPreviousQuestionServer");
+  });
 
-  socket.on('timerStartAdmin', () => {
-    console.log('Timer start btn admin');
-    io.emit('timerStartServer')
-  })
+  socket.on("goToNextQuestionAdmin", () => {
+    console.log("Next question btn admin");
+    io.emit("goToNextQuestionServer");
+  });
 
-  socket.on('handleChangeOptionAdmin', (data) => {
-    console.log('Change Option admin');
-    io.emit('handleChangeOptionServer',data) 
-  })
+  socket.on("timerStartAdmin", () => {
+    console.log("Timer start btn admin");
+    io.emit("timerStartServer");
+  });
 
-  socket.on('showCorretAnswerAdmin', () => {
-    console.log('Correct answer show btn admin');
-    io.emit('showCorretAnswerServer')
-  })
+  socket.on("handleChangeOptionAdmin", (data) => {
+    console.log("Change Option admin");
+    io.emit("handleChangeOptionServer", data);
+  });
 
-  socket.on('showWrongAnswerAdmin', () => {
-    console.log('Wrong answer show btn admin');
-    io.emit('showWrongAnswerServer')
-  })
+  socket.on("showCorretAnswerAdmin", () => {
+    console.log("Correct answer show btn admin");
+    io.emit("showCorretAnswerServer");
+  });
 
-  socket.on('handleLockPlayerAdmin', (data) => {
-    console.log('Player lock btn admin');
-    io.emit('handleLockPlayerServer', data);
-  })
+  socket.on("showWrongAnswerAdmin", () => {
+    console.log("Wrong answer show btn admin");
+    io.emit("showWrongAnswerServer");
+  });
 
-  socket.on('handleScoreChangeAdmin', (scores) => {
-    console.log('handleScoreChangeAdmin', scores);
-    io.emit('handleScoreChangeServer', scores);
-  })
+  socket.on("handleLockPlayerAdmin", (data) => {
+    console.log("Player lock btn admin");
+    io.emit("handleLockPlayerServer", data);
+  });
+
+  socket.on("handleScoreChangeAdmin", (scores) => {
+    console.log("handleScoreChangeAdmin", scores);
+    io.emit("handleScoreChangeServer", scores);
+  });
   // Handle disconnection
-  socket.on('disconnect', () => {
-    console.log('A client disconnected:', socket.id);
+  socket.on("disconnect", () => {
+    console.log("A client disconnected:", socket.id);
   });
 });
 
